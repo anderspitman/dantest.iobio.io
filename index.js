@@ -52,7 +52,9 @@ uppie(document.querySelector('#file-input'), async (event, formData, files) => {
     };
 
     inflate.onEnd = (status) => {
-      console.log(readLengthSum, numReads, readLengthSum/numReads);
+      const gBases = readLengthSum / 1e9;
+      console.log("Read length: ", readLengthSum/numReads);
+      console.log("GBases: ", gBases);
     };
 
     const chunkSize = 1024*1024;
@@ -65,7 +67,6 @@ uppie(document.querySelector('#file-input'), async (event, formData, files) => {
         const buf = new Uint8Array(event.target.result);
         if (offset + chunkSize > file.size) {
           const success = inflate.push(buf, true);
-          console.log("done", success);
         }
         else {
           const success = inflate.push(buf, false);
