@@ -1,3 +1,6 @@
 [submodule "deps/uppie"]
 	path = deps/uppie
 	url = https://github.com/silverwind/uppie
+[submodule "deps/pako"]
+	path = deps/pako
+	url = https://github.com/nodeca/pako
