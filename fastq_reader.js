@@ -51,14 +51,27 @@ function readFastq(file, onProgress) {
 
   const chunkSize = 1024*1024;
 
+  let curBytes = 0;
+  let bytesPerSeconds = 0;
+
+  const intervalId = setInterval(() => {
+    bytesPerSeconds = curBytes;
+    curBytes = 0;
+  }, 1000);
+
+
   function readChunk(file, offset) {
 
     const fileReader = new FileReader();
 
     fileReader.onload = (event) => {
+
+      curBytes += chunkSize;
+
       const buf = new Uint8Array(event.target.result);
       if (offset + chunkSize > file.size) {
         const success = inflate.push(buf, true);
+        clearInterval(intervalId);
       }
       else {
         const success = inflate.push(buf, false);
@@ -67,7 +80,8 @@ function readFastq(file, onProgress) {
 
       if (onProgress) {
         const ratio = Math.min((offset + chunkSize)/file.size, 1.0);
-        onProgress(ratio);
+        const megabytesPerSecond = bytesPerSeconds / 1e6;
+        onProgress(ratio, megabytesPerSecond);
       }
     };
 
