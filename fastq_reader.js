@@ -8,6 +8,9 @@ function readFastq(file, onProgress) {
   let readLengthSum = 0;
   let remainder = '';
 
+  let GBases = 0;
+  let readLength = 0;
+
   // process data, splitting on newlines
   inflate.onData = (data) => {
     let chunk = decoder.decode(data);
@@ -41,12 +44,14 @@ function readFastq(file, onProgress) {
     if (chunk.length > 0) {
       remainder = chunk;
     }
+
+    readLength = readLengthSum / numReads;
+    GBases = readLengthSum / 1e9;
   };
 
   inflate.onEnd = (status) => {
-    const gBases = readLengthSum / 1e9;
-    console.log("Read length: ", readLengthSum/numReads);
-    console.log("GBases: ", gBases);
+    console.log("Read length: ", readLength);
+    console.log("GBases: ", GBases);
   };
 
   const chunkSize = 1024*1024;
@@ -81,7 +86,7 @@ function readFastq(file, onProgress) {
       if (onProgress) {
         const megabytesPerSecond = bytesPerSeconds / 1e6;
         const progressBytes = Math.min(offset + chunkSize, file.size);
-        onProgress(progressBytes, megabytesPerSecond);
+        onProgress(progressBytes, megabytesPerSecond, readLength, GBases);
       }
     };
 

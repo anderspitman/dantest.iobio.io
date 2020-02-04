@@ -20,12 +20,20 @@ const FileView = (file) => {
   const bitrateEl = document.createElement('div');
   dom.appendChild(bitrateEl);
 
-  readFastq(file, function onProgress(bytes, megabytesPerSecond) {
+  const readLengthEl = document.createElement('div');
+  dom.appendChild(readLengthEl);
+
+  const GBasesEl = document.createElement('div');
+  dom.appendChild(GBasesEl);
+
+  readFastq(file, function onProgress(bytes, megabytesPerSecond, readLength, GBases) {
     const ratio = bytes / file.size;
     const percent = ratio*100;
     progressBarEl.value = percent;
     progressTextEl.innerText = (bytes/1e6).toFixed(2) + "/" + (file.size/1e6).toFixed(2) + " MB";
     bitrateEl.innerText = megabytesPerSecond.toFixed(0) + " MB/s";
+    readLengthEl.innerText = "Read length: " + readLength;
+    GBasesEl.innerText = "Total GBases: " + GBases;
   });
 
 
