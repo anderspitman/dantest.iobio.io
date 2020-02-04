@@ -79,9 +79,9 @@ function readFastq(file, onProgress) {
       }
 
       if (onProgress) {
-        const ratio = Math.min((offset + chunkSize)/file.size, 1.0);
         const megabytesPerSecond = bytesPerSeconds / 1e6;
-        onProgress(ratio, megabytesPerSecond);
+        const progressBytes = Math.min(offset + chunkSize, file.size);
+        onProgress(progressBytes, megabytesPerSecond);
       }
     };
 

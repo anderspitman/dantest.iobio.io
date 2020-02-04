@@ -14,13 +14,18 @@ const FileView = (file) => {
   progressBarEl.value = 0;
   dom.appendChild(progressBarEl);
 
+  const progressTextEl = document.createElement('div');
+  dom.appendChild(progressTextEl);
+
   const bitrateEl = document.createElement('div');
   dom.appendChild(bitrateEl);
 
-  readFastq(file, function onProgress(ratio, megabytesPerSecond) {
+  readFastq(file, function onProgress(bytes, megabytesPerSecond) {
+    const ratio = bytes / file.size;
     const percent = ratio*100;
     progressBarEl.value = percent;
-    bitrateEl.innerText = megabytesPerSecond + " MB/s";
+    progressTextEl.innerText = (bytes/1e6).toFixed(2) + "/" + (file.size/1e6).toFixed(2) + " MB";
+    bitrateEl.innerText = megabytesPerSecond.toFixed(0) + " MB/s";
   });
 
 
