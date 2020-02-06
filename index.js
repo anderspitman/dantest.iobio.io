@@ -2,7 +2,7 @@ import { FileView } from './views/file.js';
 
 const contentEl = document.querySelector('.content');
 
-const samtoolsWorker = new Worker('./file_handler_worker.js');
+const samtoolsWorker = new Worker('./samtools_worker.js');
 
 let bamFile = null;
 let baiFile = null;

@@ -1,3 +1,12 @@
+Module = {};
+
+Module.noInitialRun = true;
+
+let globalStdout = '';
+Module.print = (text) => {
+  globalStdout += text + '\n';
+};
+
 self.importScripts('samtools.js');
 
 const DIR = '/data';
@@ -29,14 +38,27 @@ function doIt(rpc) {
   switch (rpc.method) {
     case 'idxstats':
       Module.callMain(["idxstats", `/data/${bamFile.name}`]);
+      const stats = parseIdxStats(globalStdout);
+      globalStdout = '';
+      console.log(stats);
       break;
   }
-
-  //Module.callMain(["view", "-H", "/tmp/examples/toy.sam"]);
-  //Module.callMain(["idxstats", `/data/${file.name}`]);
 }
 
 self.onmessage = (message) => {
   const rpc = message.data;
   doIt(rpc);
 };
+
+
+function parseIdxStats(text) {
+  return text.split('\n')
+    .map(line => line.split('\t'))
+    .map(parts => ({
+      refSeqName: parts[0],
+      seqLength: Number(parts[1]),
+      numMapped: Number(parts[2]),
+      numUnmapped: Number(parts[3])
+    }))
+    .filter(rec => rec.seqLength > 10000000);
+}
