@@ -66,13 +66,13 @@ uppie(document.querySelector('#file-input'), async (event, formData, files) => {
 
     if (bamFile && baiFile) {
 
-      const stats = await samtoolsRpc.call('idxstats', {
+      const idxstats = await samtoolsRpc.call('idxstats', {
         bamFile,
         baiFile,
       });
 
       let refName;
-      for (const stat of stats) {
+      for (const stat of idxstats) {
         if (stat.refSeqName === 'chr1') {
           refName = 'chr1';
           break;
@@ -93,6 +93,29 @@ uppie(document.querySelector('#file-input'), async (event, formData, files) => {
         refName,
       });
       console.log(readLength);
+
+      const avgReadDepths = idxstats
+        .map(stat => {
+          const avgDepth = (stat.numMapped * readLength) / stat.seqLength;
+          return {
+            [stat.refSeqName]: avgDepth,
+          };
+        });
+
+      console.log(idxstats);
+      console.log(avgReadDepths);
+
+      const stats = [];
+
+      let totalMapped = 0;
+      let totalUnmapped = 0;
+      for (const stat of idxstats) {
+        totalMapped += stat.numMapped;
+        totalUnmapped += stat.numUnmapped;
+      }
+
+      const rawGBases = ((totalMapped + totalUnmapped) * readLength) / 1e9;
+      console.log("Raw GBases: ", rawGBases);
 
     }
 
