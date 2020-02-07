@@ -1,4 +1,4 @@
-import { FileView } from './views/file.js';
+import { ReportView } from './views/report.js';
 
 
 class WorkerRPC {
@@ -117,10 +117,9 @@ uppie(document.querySelector('#file-input'), async (event, formData, files) => {
       const rawGBases = ((totalMapped + totalUnmapped) * readLength) / 1e9;
       console.log("Raw GBases: ", rawGBases);
 
+      const reportView = ReportView(readLength, rawGBases);
+      contentEl.appendChild(reportView);
     }
-
-    //const fileView = FileView(file);
-    //contentEl.appendChild(fileView);
   }
 });
 
