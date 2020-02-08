@@ -7,10 +7,26 @@
     <title>dantest</title>
 
     <style>
+      html {
+        background-color: #999;
+      }
+
+      body {
+        margin: 0;
+      }
+
       main {
         margin: 0 auto;
-        max-width: 720px;
+        max-width: 640px;
+        height: 100vh;
+        color: #222;
         font-family: Verdana;
+        font-size: 20px;
+        background-color: #f4f4f4;
+      }
+
+      .content {
+        margin: 20px;
       }
 
       .dantest-file-view {
@@ -19,12 +35,74 @@
         border: 2px solid #000;
         padding: 10px;
       }
+
+      .instructions {
+        padding: 0px 50px;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+      }
+
+      .section-header {
+        font-size: 22px;
+        font-weight: bold;
+        margin: 10px 0px;
+      }
+
+      .file-chooser {
+        display: flex;
+        justify-content: center;
+      }
+
+      .file-chooser__btn {
+        display: inline-block;
+        border: none;
+        padding: 1rem 6rem;
+        margin: 0;
+        text-decoration: none;
+        background: #0069ed;
+        color: #ffffff;
+        font-family: sans-serif;
+        font-size: 1rem;
+        cursor: pointer;
+        text-align: center;
+        transition: background 50ms ease-in-out, 
+                    transform 50ms ease;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+      }
+
+      .file-chooser__btn:hover,
+      .file-chooser__btn:focus {
+        background: #0053ba;
+      }
+      
+      .file-chooser__btn:focus {
+        outline: 1px solid #fff;
+        outline-offset: -4px;
+      }
+      
+      .file-chooser__btn:active {
+        transform: scale(0.99);
+      }
+
+      .file-chooser__input {
+        display: none;
+      }
     </style>
   </head>
 
   <body>
     <main>
-      <input type="file" id="file-input" multiple />
+      <div class='instructions'>
+        <p>
+          Drag files onto this page, or select them using the button
+        </p>
+      </div>
+      <div class='file-chooser'>
+        <button class='file-chooser__btn'>Open file(s)</button>
+        <input type="file" class="file-chooser__input" multiple />
+      </div>
       <div class='content'></div>
     </main>
     <script src='./deps/uppie/uppie.js'></script>

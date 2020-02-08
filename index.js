@@ -1,4 +1,5 @@
 import { ReportView } from './views/report.js';
+import { CheckedFileView } from './views/checked_file.js';
 
 
 class WorkerRPC {
@@ -44,27 +45,69 @@ class WorkerRPC {
 
 const contentEl = document.querySelector('.content');
 
+const requiredFilesEl = document.createElement('h1');
+requiredFilesEl.classList.add('section-header');
+requiredFilesEl.innerText = "Required files:";
+contentEl.appendChild(requiredFilesEl);
+
+const bamFileView = CheckedFileView('BAM');
+contentEl.appendChild(bamFileView.dom);
+
+const baiFileView = CheckedFileView('BAM index (BAI)');
+contentEl.appendChild(baiFileView.dom);
+
+const reportHeaderEl = document.createElement('h1');
+reportHeaderEl.classList.add('section-header');
+reportHeaderEl.innerText = "Report:";
+contentEl.appendChild(reportHeaderEl);
+
+const reportContainer = document.createElement('div');
+reportContainer.innerText = "Waiting for required files";
+contentEl.appendChild(reportContainer);
+
 let bamFile = null;
 let baiFile = null;
 
 const samtoolsRpc = new WorkerRPC('./samtools_worker.js');
 
 const uppie = new Uppie();
-uppie(document.querySelector('#file-input'), async (event, formData, files) => {
 
+const fileInput = document.querySelector('.file-chooser__input');
+const fileInputBtn = document.querySelector('.file-chooser__btn');
+
+fileInputBtn.addEventListener('click', (e) => {
+  fileInput.click();
+});
+
+// Handle input files
+uppie(fileInput, (event, formData, filenames) => {
+  handleFormData(formData);
+});
+
+// Handle drag-and-drop files
+uppie(document.documentElement, (event, formData, filenames) => {
+  handleFormData(formData);
+});
+
+
+async function handleFormData(formData) {
   for (const entry of formData.entries()) {
 
     const file = entry[1];
 
     if (file.name.endsWith('bam')) {
       bamFile = file;
+      bamFileView.onStateChange({ filename: file.name });
     }
 
     if (file.name.endsWith('bai')) {
       baiFile = file;
+      baiFileView.onStateChange({ filename: file.name });
     }
 
     if (bamFile && baiFile) {
+
+      reportContainer.innerText = "Generating report...";
 
       const idxstats = await samtoolsRpc.call('idxstats', {
         bamFile,
@@ -118,10 +161,8 @@ uppie(document.querySelector('#file-input'), async (event, formData, files) => {
       console.log("Raw GBases: ", rawGBases);
 
       const reportView = ReportView(readLength, rawGBases);
-      contentEl.appendChild(reportView);
+      reportContainer.innerText = '';
+      reportContainer.appendChild(reportView);
     }
   }
-});
-
-
-
+}
