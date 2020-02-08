@@ -153,15 +153,21 @@ async function handleFormData(formData) {
 
       let totalMapped = 0;
       let totalUnmapped = 0;
+      let totalSeqLength = 0;
       for (const stat of idxstats) {
         totalMapped += stat.numMapped;
         totalUnmapped += stat.numUnmapped;
+        totalSeqLength += stat.seqLength;
       }
 
       const rawGBases = ((totalMapped + totalUnmapped) * readLength) / 1e9;
       console.log("Raw GBases: ", rawGBases);
 
-      const reportView = ReportView(readLength, rawGBases);
+      const ratioMapped = totalMapped / (totalMapped + totalUnmapped);
+
+      const mappedAvgReadDepth = (totalMapped * readLength) / totalSeqLength;
+
+      const reportView = ReportView(readLength, rawGBases, ratioMapped, mappedAvgReadDepth);
       reportContainer.innerText = '';
       reportContainer.appendChild(reportView);
     }
