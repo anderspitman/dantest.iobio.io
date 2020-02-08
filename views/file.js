@@ -3,7 +3,7 @@ import { readFastq } from '../fastq_reader.js';
 const FileView = (file) => {
   
   const dom = document.createElement('div');
-  dom.classList.add('dantest-file-view');
+  dom.classList.add('qual-iobio-file-view');
 
   const filenameEl = document.createElement('div');
   filenameEl.innerText = file.name + ": ";
