@@ -4,7 +4,7 @@ const CheckedFileView = (title) => {
   dom.classList.add('checked-file-view');
 
   const titleEl = document.createElement('span');
-  titleEl.innerText = title + " file: please select one";
+  titleEl.innerText = title + " file: drag here or select below";
   dom.appendChild(titleEl);
 
   //const filenameEl = document.createElement('div');

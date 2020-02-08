@@ -1,5 +1,6 @@
 import { ReportView } from './views/report.js';
 import { CheckedFileView } from './views/checked_file.js';
+import { FileChooserView } from './views/file_chooser.js';
 
 
 class WorkerRPC {
@@ -56,6 +57,9 @@ contentEl.appendChild(bamFileView.dom);
 const baiFileView = CheckedFileView('BAM index (BAI)');
 contentEl.appendChild(baiFileView.dom);
 
+const fileChooserEl = FileChooserView();
+contentEl.appendChild(fileChooserEl.dom);
+
 const reportHeaderEl = document.createElement('h1');
 reportHeaderEl.classList.add('section-header');
 reportHeaderEl.innerText = "Report:";
@@ -72,15 +76,12 @@ const samtoolsRpc = new WorkerRPC('./samtools_worker.js');
 
 const uppie = new Uppie();
 
-const fileInput = document.querySelector('.file-chooser__input');
-const fileInputBtn = document.querySelector('.file-chooser__btn');
+//const fileInput = document.querySelector('.file-chooser__input');
+//const fileInputBtn = document.querySelector('.file-chooser__btn');
 
-fileInputBtn.addEventListener('click', (e) => {
-  fileInput.click();
-});
 
 // Handle input files
-uppie(fileInput, (event, formData, filenames) => {
+uppie(fileChooserEl.fileInput, (event, formData, filenames) => {
   handleFormData(formData);
 });
 
