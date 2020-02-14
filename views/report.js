@@ -1,3 +1,5 @@
+const VERSION = '0.1.0';
+
 const ReportView = (readLength, rawGBases, ratioMapped, mappedAvgReadDepth) => {
   const dom = document.createElement('div');
   dom.classList.add('qual-iobio-report-view');
@@ -59,6 +61,11 @@ const ReportView = (readLength, rawGBases, ratioMapped, mappedAvgReadDepth) => {
           <td class='qual-iobio-report__cell'>
             Preferably >30 (the real source of the 30x declaration)
           </td>
+        </tr>
+        <tr class='qual-iobio-report__row'>
+          <th colspan='3' class='qual-iobio-report__cell'>
+            qual.iobio version: ${VERSION}
+          </th>
         </tr>
       </table>
     </div>
