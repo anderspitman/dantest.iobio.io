@@ -115,28 +115,7 @@ async function handleFormData(formData) {
         baiFile,
       });
 
-      let refName;
-      for (const stat of idxstats) {
-        if (stat.refSeqName === 'chr1') {
-          refName = 'chr1';
-          break;
-        }
-        if (stat.refSeqName === '1') {
-          refName = '1';
-          break;
-        }
-      }
-
-      if (!refName) {
-        alert("Missing chr1, which is needed for read length estimation");
-      }
-
-      const readLength = await samtoolsRpc.call('getReadLength', {
-        bamFile,
-        baiFile,
-        refName,
-      });
-      console.log(readLength);
+      const readLength = await getReadLength(samtoolsRpc, bamFile, baiFile, idxstats);
 
       const avgReadDepths = idxstats
         .map(stat => {
@@ -145,9 +124,6 @@ async function handleFormData(formData) {
             [stat.refSeqName]: avgDepth,
           };
         });
-
-      console.log(idxstats);
-      console.log(avgReadDepths);
 
       const stats = [];
 
@@ -161,7 +137,6 @@ async function handleFormData(formData) {
       }
 
       const rawGBases = ((totalMapped + totalUnmapped) * readLength) / 1e9;
-      console.log("Raw GBases: ", rawGBases);
 
       const ratioMapped = totalMapped / (totalMapped + totalUnmapped);
 
@@ -172,4 +147,73 @@ async function handleFormData(formData) {
       reportContainer.appendChild(reportView);
     }
   }
+}
+
+// TODO: this is a pretty hacky method of doing this. Ideally we would be able
+// to make samtools block on stdout, so we just read as many lines as we need
+// until we have enough reads. But I haven't figured out a way to do that, so
+// I'm splitting it across multiple calls.
+async function getReadLength(samtoolsRpc, bamFile, baiFile, refs) {
+
+  // Sort refs descending by sequence length
+  const sortedRefs = refs 
+    .slice()
+    .sort((a, b) => {
+      if (a.seqLength < b.seqLength) return -1;
+      if (a.seqLength > b.seqLength) return 1;
+      return 0;
+    })
+    .reverse()
+
+  let readsRemaining = 1000;
+  let readsCollected = 0;
+
+  let totalReadLength = 0;
+
+  for (const ref of sortedRefs) {
+
+    const reads = await getReadsFromRef(samtoolsRpc, bamFile, baiFile, ref, readsRemaining);
+    readsCollected += reads.length;
+    readsRemaining -= reads.length;
+
+    totalReadLength += reads
+      .map(line => line.split('\t'))
+      .map(record => record[9])
+      .filter(read => read !== undefined)
+      .map(read => read.length)
+      .reduce((acc, cur) => acc + cur)
+
+    if (readsRemaining < 0) {
+      break;
+    }
+  }
+
+  return totalReadLength / readsCollected;
+}
+
+async function getReadsFromRef(samtoolsRpc, bamFile, baiFile, ref, maxReads) {
+
+  const step = 100000;
+
+  let allReads = [];
+
+  for (let i = 0; i < ref.seqLength; i += step) {
+
+    const view = await samtoolsRpc.call('view', {
+      bamFile,
+      baiFile,
+      refName: ref.refSeqName,
+      start: i,
+      end: i + step,
+    });
+
+    const reads = view.split('\n');
+    allReads = [...allReads, ...reads];
+
+    if (allReads.length > maxReads) {
+      break;
+    }
+  }
+
+  return allReads;
 }

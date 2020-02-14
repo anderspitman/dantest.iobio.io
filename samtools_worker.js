@@ -50,29 +50,19 @@ function doIt(rpc) {
       break;
     }
 
-    case 'getReadLength': {
+    case 'view': {
 
-      const refName = rpc.params.refName;
+      const region = `${rpc.params.refName}:${rpc.params.start}-${rpc.params.end}`;
 
-      // TODO: this is super brittle;
-      Module.callMain(["view", `/data/${bamFile.name}`, `${refName}:1-20000`]);
-      const viewOutput = parseView(globalStdout);
-
-      const totalReadLength = viewOutput
-        .map(record => record[9])
-        .filter(read => read)
-        .map(read => read.length)
-        .reduce((acc, cur) => acc + cur)
-
-      const readLength = totalReadLength / viewOutput.length;
-
-      globalStdout = '';
+      Module.callMain(["view", `/data/${bamFile.name}`, region]);
 
       self.postMessage({
         jsonrpc: '2.0',
-        result: readLength,
+        result: globalStdout,
         id: rpc.id,
       });
+
+      globalStdout = '';
 
       break;
     }

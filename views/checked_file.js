@@ -12,7 +12,6 @@ const CheckedFileView = (title) => {
   //dom.appendChild(filenameEl);
 
   function onStateChange(state) {
-    console.log("changy");
     titleEl.innerText = title + " file: " + state.filename;
   }
 

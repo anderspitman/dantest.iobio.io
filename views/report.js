@@ -24,7 +24,7 @@ const ReportView = (readLength, rawGBases, ratioMapped, mappedAvgReadDepth) => {
             ${readLength.toFixed(2)}
           </td>
           <td class='qual-iobio-report__cell'>
-            Usually about 100, 150, etc
+            Usually almost exactly 100, 150, etc
           </td>
         </tr>
         <tr class='qual-iobio-report__row raw-gbases'>
