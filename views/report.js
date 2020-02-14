@@ -1,5 +1,3 @@
-const VERSION = '0.1.0';
-
 const ReportView = (readLength, rawGBases, ratioMapped, mappedAvgReadDepth) => {
   const dom = document.createElement('div');
   dom.classList.add('qual-iobio-report-view');
@@ -7,6 +5,11 @@ const ReportView = (readLength, rawGBases, ratioMapped, mappedAvgReadDepth) => {
   dom.innerHTML = `
     <div class='qual-iobio-report'>
       <table class='qual-iobio-report__table'>
+        <tr class='qual-iobio-report__row'>
+          <th colspan='3' class='qual-iobio-report__cell'>
+            Summary
+          </th>
+        </tr>
         <tr class='qual-iobio-report__row'>
           <th class='qual-iobio-report__cell'>
             Item
@@ -62,11 +65,6 @@ const ReportView = (readLength, rawGBases, ratioMapped, mappedAvgReadDepth) => {
             Preferably >30 (the real source of the 30x declaration)
           </td>
         </tr>
-        <tr class='qual-iobio-report__row'>
-          <th colspan='3' class='qual-iobio-report__cell'>
-            qual.iobio version: ${VERSION}
-          </th>
-        </tr>
       </table>
     </div>
   `;
@@ -84,7 +82,7 @@ const ReportView = (readLength, rawGBases, ratioMapped, mappedAvgReadDepth) => {
   ratioMappedEl.style.backgroundColor = ratioMapped >= 0.95 ? goodColor : warningColor;
 
   const mappedAvgReadDepthEl = dom.querySelector('.mapped-avg-read-depth');
-  mappedAvgReadDepthEl.style.backgroundColor = mappedAvgReadDepth >= 30 ? goodColor : warningColor;
+  mappedAvgReadDepthEl.style.backgroundColor = mappedAvgReadDepth.toFixed(0) >= 30 ? goodColor : warningColor;
 
   return dom;
 };

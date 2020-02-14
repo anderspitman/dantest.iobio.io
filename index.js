@@ -1,6 +1,9 @@
 import { ReportView } from './views/report.js';
+import { ChromosomeReport } from './views/chromosome_report.js';
 import { CheckedFileView } from './views/checked_file.js';
 import { FileChooserView } from './views/file_chooser.js';
+
+const VERSION = '0.1.0';
 
 
 class WorkerRPC {
@@ -62,12 +65,16 @@ contentEl.appendChild(fileChooserEl.dom);
 
 const reportHeaderEl = document.createElement('h1');
 reportHeaderEl.classList.add('section-header');
-reportHeaderEl.innerText = "Report:";
+reportHeaderEl.innerText = `Report (version ${VERSION}):`;
 contentEl.appendChild(reportHeaderEl);
 
 const reportContainer = document.createElement('div');
 reportContainer.innerText = "Waiting for required files";
 contentEl.appendChild(reportContainer);
+
+const chrReportContainer = document.createElement('div');
+//chrReportContainer.innerText = "Waiting for required files";
+contentEl.appendChild(chrReportContainer);
 
 let bamFile = null;
 let baiFile = null;
@@ -117,14 +124,6 @@ async function handleFormData(formData) {
 
       const readLength = await getReadLength(samtoolsRpc, bamFile, baiFile, idxstats);
 
-      const avgReadDepths = idxstats
-        .map(stat => {
-          const avgDepth = (stat.numMapped * readLength) / stat.seqLength;
-          return {
-            [stat.refSeqName]: avgDepth,
-          };
-        });
-
       const stats = [];
 
       let totalMapped = 0;
@@ -145,6 +144,9 @@ async function handleFormData(formData) {
       const reportView = ReportView(readLength, rawGBases, ratioMapped, mappedAvgReadDepth);
       reportContainer.innerText = '';
       reportContainer.appendChild(reportView);
+
+      const chrReportView = ChromosomeReport(idxstats, readLength);
+      chrReportContainer.appendChild(chrReportView);
     }
   }
 }
