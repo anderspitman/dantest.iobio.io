@@ -172,6 +172,10 @@ async function getReadLength(samtoolsRpc, bamFile, baiFile, refs) {
 
   for (const ref of sortedRefs) {
 
+    if (ref.numMapped === 0) {
+      continue;
+    }
+
     const reads = await getReadsFromRef(samtoolsRpc, bamFile, baiFile, ref, readsRemaining);
     readsCollected += reads.length;
     readsRemaining -= reads.length;
@@ -181,7 +185,7 @@ async function getReadLength(samtoolsRpc, bamFile, baiFile, refs) {
       .map(record => record[9])
       .filter(read => read !== undefined)
       .map(read => read.length)
-      .reduce((acc, cur) => acc + cur)
+      .reduce((acc, cur) => acc + cur, 0)
 
     if (readsRemaining < 0) {
       break;
@@ -207,7 +211,12 @@ async function getReadsFromRef(samtoolsRpc, bamFile, baiFile, ref, maxReads) {
       end: i + step,
     });
 
+    if (view === "") {
+      continue;
+    }
+
     const reads = view.split('\n');
+
     allReads = [...allReads, ...reads];
 
     if (allReads.length > maxReads) {

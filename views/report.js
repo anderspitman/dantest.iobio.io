@@ -24,7 +24,7 @@ const ReportView = (readLength, rawGBases, ratioMapped, mappedAvgReadDepth) => {
             ${readLength.toFixed(2)}
           </td>
           <td class='qual-iobio-report__cell'>
-            Usually almost exactly 100, 150, etc
+            Should be almost exactly 100, 150, etc
           </td>
         </tr>
         <tr class='qual-iobio-report__row raw-gbases'>
@@ -46,7 +46,7 @@ const ReportView = (readLength, rawGBases, ratioMapped, mappedAvgReadDepth) => {
             ${(ratioMapped * 100).toFixed(2)}
           </td>
           <td class='qual-iobio-report__cell'>
-            Looking for 95% or higher usually
+            Looking for 95% or higher
           </td>
         </tr>
         <tr class='qual-iobio-report__row mapped-avg-read-depth'>
